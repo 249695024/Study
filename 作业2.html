@@ -46,6 +46,39 @@
                 });
             },
 
+            //移除事项
+            removeTodo: function (item) {
+
+                var arr = this.state.todos.slice();
+                var index = arr.findIndex(function (value, index, arr) {
+                    return value.title === item.title;
+                });
+                arr.splice(index, 1);
+                this.setState({
+                    todos: arr
+                });
+            },
+
+            //更改完成状态
+            changeTodoStatus: function (updateItem) {
+                var arr = this.state.todos.slice();
+                var item = arr.find(function (value, index, arr) {
+                    return updateItem.id === value.id;
+                });
+
+                item.finished = updateItem.finished;
+                this.setState({
+                    // ThingsValue: 3,
+                    todos: arr
+                });
+            },
+
+            change: function (status) {
+                this.setState({
+                    ThingsValue: status
+                })
+            },
+
             render: function () {
                 return (
                     <div>
@@ -58,14 +91,13 @@
                             onChangeTitle={this.changeData}
                             todos={this.state.todos}
                             ThingsValue={this.state.ThingsValue}></List>
-                        <Footer></Footer>
+                        <Footer tochange={this.change}></Footer>
                     </div>
                 );
             }
         });
 
         ///子组件模块
-        ///添加内容主要流程：1 点解按钮获取
         var Add = React.createClass({
 
             addNewText: function () {
@@ -76,7 +108,7 @@
                     title: this.refs.newText.value,
                     finished: false
                 });
-                this.refs.newTitle.value = "";
+                this.refs.newText.value = "";
             },
             render: function () {
                 return (
@@ -118,8 +150,7 @@
                                         onChange={() => compo.todoStatusChange(item)} />
                                 </td>
                                 <td>
-                                    <input type="text" className={item.finished ? 'finished' : ''}
-                                        onChange={compo.changeText} value={item.title} />
+                                    <input type="text" onChange={compo.changeText} value={item.title} />
                                 </td>
                                 <td><button onClick={() => compo.todoRemove(item)}>删除</button></td>
                             </tr>
@@ -173,12 +204,29 @@
 
         ///子组件
         var Footer = React.createClass({
+
+            ShowAll: function () {
+                let all = this.refs.all.value;
+                this.props.tochange(all);
+            },
+
+            ShowUnfinish: function () {
+                let unfinish = this.refs.unfinish.value;
+                this.props.tochange(unfinish);
+
+            },
+
+            ShowFinished: function () {
+                let finished = this.refs.finished.value;
+                this.props.tochange(finished);
+            },
+
             render: function () {
                 return (
                     <div>
-                        <button type="button" value="1" ref="all" >全部</button>
-                        <button type="button" value="2" ref="unfinish" >未完成</button>
-                        <button type="button" value="3" ref="finished" >已完成</button>
+                        <button type="button" value="1" ref="all" onClick={this.ShowAll}>全部</button>
+                        <button type="button" value="2" ref="unfinish" onClick={this.ShowUnfinish}>未完成</button>
+                        <button type="button" value="3" ref="finished" onClick={this.ShowFinished}>已完成</button>
                     </div>
                 );
             }
