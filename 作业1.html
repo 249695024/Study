@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>todo 作业1</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+</head>
+<body>
+<h1>作业1</h1>
+<div>
+    <label for="">请输入：</label> 
+    <input type="text" id="text" style="border: 1px solid black;" ondblclick=""/> 
+    <button style="background:crimson;" id="add" >添加</button>
+</div>
+<div>
+    <div>
+        <h2>全部事项</h2>
+        <table border="1" style="width: 300px;">
+            <thead>
+                <th>勾选为已完成</th>
+                <th>代办事情</th>
+                <th>操作</th>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <div>
+        <button style="background:crimson;" id="all" >全部事项</button>
+        <button style="background:crimson;" id="finished" >已完成</button>
+        <button style="background:crimson;" id="unfinished">未完成</button>
+    </div>
+    </div>
+
+    <script type="text/javascript">
+    
+           var data = [
+            { content: "蔡", finished: false },
+            { content: "徐", finished: false },
+            { content: "坤", finished: false }
+        ];
+
+        $ (function(){
+            init(data);
+            $("#add").on("click", function () {
+                if ($("#text").val().trim() == "") {
+                    alert("请不能为空内容！！");
+                } else {
+                     ///push() 方法可向数组的末尾添加一个或多个元素，并返回新的长度。
+                    data.push({ content: $("#text").val(), finished: false }); 
+                    $("#text").val("");
+                    //sort() 方法用于对数组的元素进行排序。
+                    data.sort((a, b)=> a.content.localeCompare(b.content, 'zh'));
+                    init(data);
+                }
+            });
+
+            ///加载全部
+            $("#all").click(function(){
+                init(data);
+            });
+
+            ///加载已完成
+            $("#finished").click(function(){
+                finished(data);
+            });
+
+            ///未完成
+            $("#unfinished").click(function(){
+                unfinished(data);
+            });
+        });
+
+            ///初始化加载数据的方法
+            function init(data){
+                var tb ="";
+                $.each(data,function(index,data){
+                    tb +="<tr>"
+                    +"<td><input type='checkbox' class='checkbox' " + (data.finished ? 'checked' : '') + " onchange='changestatus(" + index + ")'/></td>"
+                    +"<td><input type='text'value="+ data.content +" key=" + index +" readonly='readonly' ondblclick='attrchange(this)'  onblur='save(this)' /></td>"
+                    +"<td><button class='del' onclick='del(" + index + ")' key=" + index + ">" + "删除</button></td>"
+                    +"</tr>";
+                })
+                $("tbody").empty().append(tb);
+            }
+
+            ///加载已完成数据的方法
+            function finished(data){
+                var tb ="";
+                    $.each(data,function(index,data){
+                        if(data.finished){
+                                tb +="<tr>"
+                                +"<td><input type='checkbox' class='checkbox' " + (data.finished ? 'checked' : '') + " onchange='changestatus(" + index + ")'/></td>"
+                                +"<td><input type='text'value="+ data.content +" key=" + index +" readonly='readonly' ondblclick='attrchange(this)'  onblur='save(this)' /></td>"
+                                +"<td><button class='del' onclick='del(" + index + ")' key=" + index + ">" + "删除</button></td>"
+                                +"</tr>";
+                        }
+                    })
+                $("tbody").empty().append(tb);
+            }
+
+            ///加载未完成数据的方法
+            function unfinished(data){
+                var tb ="";
+                    $.each(data,function(index,data){
+                        if(!data.finished){
+                                tb +="<tr>"
+                                +"<td><input type='checkbox' class='checkbox' " + (data.finished ? 'checked' : '') + " onchange='changestatus(" + index + ")'/></td>"
+                                +"<td><input type='text'value="+ data.content +" key=" + index +" readonly='readonly' ondblclick='attrchange(this)'  onblur='save(this)' /></td>"
+                                +"<td><button class='del' onclick='del(" + index + ")' key=" + index + ">" + "删除</button></td>"
+                                +"</tr>";
+                        }
+                    })
+                $("tbody").empty().append(tb);
+            }
+
+            ///输入框文本只读属性为可读修改
+            function attrchange(input){
+                input.removeAttribute("readonly"); 
+                console.info(input)    
+            }
+
+            ///保存修改后的文本值
+            function save(input){
+                input.setAttribute("readonly","readonly"); 
+                var index = input.getAttribute("key");
+                data[index].content = input.value;
+                data.sort((a, b)=> a.content.localeCompare(b.content, 'zh'));
+                init(data);
+            }
+   
+            //更改状态
+            function changestatus(id) {
+                        data[id].finished = !data[id].finished; //取反
+                        init(data);
+                    }
+
+
+             //删除
+            function del(id) {
+                ///splice() 方法向/从数组中添加/删除项目，然后返回被删除的项目。
+                ///例子：splice(2,3,"William")   
+                ///注明：2：代表数组下标（包含2这个下标的元素）
+                ///注明：3：代表删除3个元素
+                ///注明：William：代表在删除上面的三个元素后，在尾部接着增加一个William这个元素
+                if(data[id].finished){                   
+                    data.splice(id, 1); //删除数组中的元素
+                    init(data);
+                }  else{
+                    alert("请勾选完成项！！")
+                }                  
+            }
+    </script>
+</body>
+</html>

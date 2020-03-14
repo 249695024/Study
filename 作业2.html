@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="react/react.js"></script>
+    <script src="react/react-dom.js"></script>
+    <script src="babel/browser.js"></script>
+
+    <title>作业2</title>
+</head>
+
+<body>
+    <div id="content"></div>
+
+    <script type="text/babel">
+
+        var data = [
+            { id: 1, title: "面对", finished: false },
+            { id: 2, title: "疾风", finished: false },
+            { id: 3, title: "吧11", finished: false },
+            { id: 4, title: "快乐", finished: false },
+        ];
+
+        ///父组件
+        var Sta = React.createClass({
+
+            ///初始化数据
+            getInitialState: function () {
+                return {
+                    ThingsValue: 1,
+                    todos: data
+                }
+            },
+
+            ///添加内容的方法
+            AddContent: function (newText) {
+                ///slice() 方法可从已有的数组中返回选定的元素。可传入下标 指定开始到指定结束 获取数组元素
+                var arr = this.state.todos.slice();
+                arr.push(newText);
+                arr.sort((a, b) => a.title.localeCompare(b.title, 'zh'));
+                ///setState为react 父级修改数据的固定写法，修改数据必须使用
+                this.setState({
+                    todos: arr
+                });
+            },
+
+            render: function () {
+                return (
+                    <div>
+                        <h3>作 业 2</h3>
+                        <Add add={this.AddContent} todos={this.state.todos}></Add>
+                        <hr />
+                        <List
+                            onTodoStatusChange={this.changeTodoStatus}
+                            onTodoRemove={this.removeTodo}
+                            onChangeTitle={this.changeData}
+                            todos={this.state.todos}
+                            ThingsValue={this.state.ThingsValue}></List>
+                        <Footer></Footer>
+                    </div>
+                );
+            }
+        });
+
+        ///子组件模块
+        ///添加内容主要流程：1 点解按钮获取
+        var Add = React.createClass({
+
+            addNewText: function () {
+                if (!this.refs.newText.value)
+                    return;
+                this.props.add({
+                    id: this.props.todos.length + 1,
+                    title: this.refs.newText.value,
+                    finished: false
+                });
+                this.refs.newTitle.value = "";
+            },
+            render: function () {
+                return (
+                    <div>
+                        添 加 内 容：<input ref="newText" />
+                        <button onClick={this.addNewText}>添 加</button>
+                    </div>
+                );
+            }
+        });
+
+        ///子组件表格模块
+        var List = React.createClass({
+
+            todoRemove: function (item) {
+                this.props.onTodoRemove(item);
+            },
+
+            todoStatusChange: function (item) {
+                item.finished = !item.finished;
+                this.props.onTodoStatusChange(item);
+            },
+
+            changeText: function (e) {
+                this.props.onChangeData(e.target.value)
+            },
+
+
+            render: function () {
+                var compo = this;
+                var status = this.props.ThingsValue;
+
+                var html = this.props.todos.map((item, index) => {
+                    if (status == 1) {
+                        return (
+                            <tr key={item.id}>
+                                <td>
+                                    <input type="checkbox" checked={item.finished}
+                                        onChange={() => compo.todoStatusChange(item)} />
+                                </td>
+                                <td>
+                                    <input type="text" className={item.finished ? 'finished' : ''}
+                                        onChange={compo.changeText} value={item.title} />
+                                </td>
+                                <td><button onClick={() => compo.todoRemove(item)}>删除</button></td>
+                            </tr>
+                        );
+                    }
+
+                    if (status == 2 && item.finished === false) {
+                        return (
+                            <tr key={item.id}>
+                                <td>
+                                    <input type="checkbox" checked={item.finished}
+                                        onChange={() => compo.todoStatusChange(item)} />
+                                </td>
+                                <td >
+                                    <input type="text" className={item.finished ? 'finished' : ''}
+                                        onChange={() => compo.changeText(item)} value={item.title} />
+                                </td>
+                                <td><button onClick={() => compo.todoRemove(item)}>删除</button></td>
+                            </tr>
+                        );
+                    }
+
+                    if (status == 3 && item.finished === true) {
+                        return (
+                            <tr key={item.id}>
+                                <td>
+                                    <input type="checkbox" checked={item.finished}
+                                        onChange={() => compo.todoStatusChange(item)} />
+                                </td>
+                                <td>
+                                    <input type="text" className={item.finished ? 'finished' : ''}
+                                        onChange={() => compo.changeText(item)} value={item.title} />
+                                </td>
+                                <td><button onClick={() => compo.todoRemove(item)}>删除</button></td>
+                            </tr>
+                        );
+                    }
+                });
+
+
+                return (
+                    <table className="todo-list">
+                        <thead><tr><th>完成</th><th>待办事项</th><th>操作</th></tr></thead>
+                        <tbody>
+                            {html}
+                        </tbody>
+                    </table>
+                );
+            }
+        });
+
+        ///子组件
+        var Footer = React.createClass({
+            render: function () {
+                return (
+                    <div>
+                        <button type="button" value="1" ref="all" >全部</button>
+                        <button type="button" value="2" ref="unfinish" >未完成</button>
+                        <button type="button" value="3" ref="finished" >已完成</button>
+                    </div>
+                );
+            }
+        });
+
+        ReactDOM.render(
+            <Sta></Sta>,
+            document.getElementById("content")
+        );
+
+    </script>
+</body>
+
+</html>
