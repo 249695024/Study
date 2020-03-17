@@ -73,10 +73,71 @@
                 });
             },
 
+            //修改数据
+            changeData: function (updateItem) {
+                console.info(updateItem)
+                var arr = this.state.todos.slice();
+                var item = arr.find(function (value, index, arr) {
+                    return parseInt(updateItem.id) === value.id;
+                });
+                item.title = updateItem.title;
+                this.setState({
+                    // ThingsValue: 3,
+                    todos: arr
+                });
+            },
+
+            //展示全部，未完成，已完成
             change: function (status) {
                 this.setState({
                     ThingsValue: status
                 })
+            },
+
+            operationUp: function (upitem) {
+                var arr = this.state.todos.slice();
+                var index = arr.findIndex(function (value) {
+                    return value.id === upitem.id;
+                });
+                if (index != 0) {
+
+                    var title = "";
+                    var fin = false;
+                    title = arr[index - 1].title;
+                    fin = arr[index - 1].finished;
+
+                    arr[index - 1].title = upitem.title;
+                    arr[index - 1].finished = upitem.finished;
+                    upitem.title = title;
+                    upitem.finished = fin;
+                    this.setState({
+                        todos: arr
+                    });
+
+                }
+            },
+
+            operationUnder: function (upitem) {
+                var arr = this.state.todos.slice();
+                var index = arr.findIndex(function (value) {
+                    return value.id === upitem.id;
+                });
+                if (index < this.state.todos.length - 1) {
+
+                    var title = "";
+                    var fin = false;
+                    title = arr[index + 1].title;
+                    fin = arr[index + 1].finished;
+
+                    arr[index + 1].title = upitem.title;
+                    arr[index + 1].finished = upitem.finished;
+                    upitem.title = title;
+                    upitem.finished = fin;
+                    this.setState({
+                        todos: arr
+                    });
+
+                }
             },
 
             render: function () {
@@ -90,7 +151,9 @@
                             onTodoRemove={this.removeTodo}
                             onChangeTitle={this.changeData}
                             todos={this.state.todos}
-                            ThingsValue={this.state.ThingsValue}></List>
+                            ThingsValue={this.state.ThingsValue}
+                            Up={this.operationUp}
+                            Under={this.operationUnder}></List>
                         <Footer tochange={this.change}></Footer>
                     </div>
                 );
@@ -132,10 +195,19 @@
                 this.props.onTodoStatusChange(item);
             },
 
-            changeText: function (e) {
-                this.props.onChangeData(e.target.value)
+            changeText: function (item) {
+                this.props.onChangeTitle({
+                    id: item.target.id,
+                    title: item.target.value
+                });
             },
 
+            onUp: function (item) {
+                this.props.Up(item);
+            },
+            onUnder: function (item) {
+                this.props.Under(item);
+            },
 
             render: function () {
                 var compo = this;
@@ -150,9 +222,11 @@
                                         onChange={() => compo.todoStatusChange(item)} />
                                 </td>
                                 <td>
-                                    <input type="text" onChange={compo.changeText} value={item.title} />
+                                    <input type="text" onChange={compo.changeText} id={item.id} value={item.title} />
                                 </td>
                                 <td><button onClick={() => compo.todoRemove(item)}>删除</button></td>
+                                <td><button onClick={() => compo.onUp(item)}>上</button></td>
+                                <td><button onClick={() => compo.onUnder(item)}>下</button></td>
                             </tr>
                         );
                     }
@@ -165,10 +239,11 @@
                                         onChange={() => compo.todoStatusChange(item)} />
                                 </td>
                                 <td >
-                                    <input type="text" className={item.finished ? 'finished' : ''}
-                                        onChange={() => compo.changeText(item)} value={item.title} />
+                                    <input type="text" onChange={compo.changeText} id={item.id} value={item.title} />
                                 </td>
                                 <td><button onClick={() => compo.todoRemove(item)}>删除</button></td>
+                                <td><button onClick={() => compo.onUp(item)}>上</button></td>
+                                <td><button onClick={() => compo.onUnder(item)}>下</button></td>
                             </tr>
                         );
                     }
@@ -181,10 +256,11 @@
                                         onChange={() => compo.todoStatusChange(item)} />
                                 </td>
                                 <td>
-                                    <input type="text" className={item.finished ? 'finished' : ''}
-                                        onChange={() => compo.changeText(item)} value={item.title} />
+                                    <input type="text" onChange={compo.changeText} id={item.id} value={item.title} />
                                 </td>
                                 <td><button onClick={() => compo.todoRemove(item)}>删除</button></td>
+                                <td><button onClick={() => compo.onUp(item)}>上</button></td>
+                                <td><button onClick={() => compo.onUnder(item)}>下</button></td>
                             </tr>
                         );
                     }
